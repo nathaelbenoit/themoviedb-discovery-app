@@ -1,0 +1,10 @@
+{
+  "name": "themoviedb-discovery-app-demo-2026-2027",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mhutchie.git-graph"
+      ]
+    }
+  }
+}
