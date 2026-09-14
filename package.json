@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:server": "tsx watch src/back-end/index.ts"
+    "dev:server": "tsx watch src/back-end/index.ts",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,11 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
     "@types/express": "^5.0.6",
     "@types/node": "^26.5.0",
+    "husky": "^9.1.7",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }
