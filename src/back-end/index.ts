@@ -1,5 +1,7 @@
 import express from 'express';
 import { tmdbAccessToken } from './config';
+import type { MoviesApiResponse, TmdbMoviesRawResponse } from './schemas/MoviesTypes';
+import { toSupportedMovie } from './utils';
 
 // Create a new express application instance
 const app = express();
@@ -31,7 +33,18 @@ app.get('/api/movies/popular', async (_req: express.Request, res: express.Respon
       throw new Error(`TMDB API request failed with status ${response.status}`);
     }
 
-    const data = await response.json();
+    // Parse the raw response from the TMDB API
+    const rawData = (await response.json()) as TmdbMoviesRawResponse;
+    
+    // Transform the raw data into the supported format for our application
+    const data: MoviesApiResponse = {
+    page: rawData.page,
+    results: rawData.results.map(toSupportedMovie),
+    total_pages: rawData.total_pages,
+    total_results: rawData.total_results
+    };
+    
+    // Send the transformed data as a JSON response
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch popular movies' });
