@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "vite",
     "dev:server": "tsx watch src/back-end/index.ts",
     "prepare": "husky"
   },
@@ -29,6 +31,7 @@
     "@commitlint/config-conventional": "^21.2.2",
     "@types/express": "^5.0.6",
     "@types/node": "^26.5.0",
+    "concurrently": "^10.0.5",
     "devmoji": "^2.3.0",
     "husky": "^9.1.7",
     "tsx": "^4.23.13",
