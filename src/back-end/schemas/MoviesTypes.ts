@@ -21,7 +21,7 @@ export type TmdbMovie = {
   title: string;
   video: boolean;
   vote_average: number;
-  vote_count: number
+  vote_count: number;
 };
 
 // TypeScript type for the API response when fetching movies, containing an array of supported Movie objects.
@@ -34,7 +34,6 @@ export type MoviesApiResponse = {
 
 // TypeScript type for the supported movie format used in our application, omitting 'adult' and 'video' properties from the TmdbMovie type.
 export type Movie = Omit<TmdbMovie, 'adult' | 'video'>;
-
 
 // TypeScript type for the API response when fetching popular movies, containing an array of supported Movie objects.
 export type ApiErrorResponse = {

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
-import type { Movie } from "../back-end/schemas/MoviesTypes"
-import MovieItem from "./components/MovieItem"
+import { useEffect, useState } from 'react';
+import type { Movie } from '../back-end/schemas/MoviesTypes';
+import MovieItem from './components/MovieItem';
 
 export default function App() {
   // State to hold the fetched movies data, initialized to null
-  const [movies, setMovies] = useState<Movie[] | null>(null)
+  const [movies, setMovies] = useState<Movie[] | null>(null);
 
   // useEffect hook to fetch data from an API when the component mounts
   useEffect(() => {
@@ -12,10 +12,10 @@ export default function App() {
     fetch('/api/movies/popular')
       .then((response) => response.json())
       .then((data) => {
-        console.log('Fetched movies data:', data) // Log the fetched data for debugging
-        setMovies(data.results) // Update the state with the fetched movies data
-      })
-  }, [])
+        console.log('Fetched movies data:', data); // Log the fetched data for debugging
+        setMovies(data.results); // Update the state with the fetched movies data
+      });
+  }, []);
 
   return (
     <div>
@@ -30,5 +30,5 @@ export default function App() {
         <p>Loading...</p>
       )}
     </div>
-  )
+  );
 }

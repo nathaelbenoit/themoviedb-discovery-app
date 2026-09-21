@@ -1,8 +1,8 @@
-import type { Movie } from "../../back-end/schemas/MoviesTypes"
+import type { Movie } from '../../back-end/schemas/MoviesTypes';
 
 type MovieItemProps = {
-  movie: Movie
-}
+  movie: Movie;
+};
 
 export default function MovieItem({ movie }: MovieItemProps) {
   return (
@@ -12,5 +12,5 @@ export default function MovieItem({ movie }: MovieItemProps) {
       <p>Release Date: {movie.release_date}</p>
       <p>Rating: {movie.vote_average}</p>
     </li>
-  )
+  );
 }

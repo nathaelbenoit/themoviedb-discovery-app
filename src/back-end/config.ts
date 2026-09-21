@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 // Charger les variables d'environnement depuis le fichier .env
 dotenv.config();
@@ -8,7 +8,7 @@ const tmdbAccessToken: string | undefined = process.env.TMDB_ACCESS_TOKEN;
 
 if (!tmdbAccessToken) {
   throw new Error(
-    "TMDB_ACCESS_TOKEN is not defined in the environment variables.",
+    'TMDB_ACCESS_TOKEN is not defined in the environment variables.',
   );
 }
 
