@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import type { Movie } from "../back-end/schemas/MoviesTypes"
+import MovieItem from "./components/MovieItem"
 
 export default function App() {
   // State to hold the fetched movies data, initialized to null
@@ -22,12 +23,7 @@ export default function App() {
       {movies ? (
         <ul>
           {movies.map((movie) => (
-            <li key={movie.id}>
-              <h2>{movie.title}</h2>
-              <p>{movie.overview}</p>
-              <p>Release Date: {movie.release_date}</p>
-              <p>Rating: {movie.vote_average}</p>
-            </li>
+            <MovieItem key={movie.id} movie={movie} />
           ))}
         </ul>
       ) : null}
