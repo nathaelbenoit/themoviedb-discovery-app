@@ -50,7 +50,7 @@
     "typescript": "^7.0.2",
     "vite": "^8.3.0"
   },
-    "lint-staged": {
+  "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,html,md,yml,yaml}": "npm run fmt",
     "*.{js,jsx,ts,tsx}": "npm run lint:fix"
   }
