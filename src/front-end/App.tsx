@@ -26,7 +26,9 @@ export default function App() {
             <MovieItem key={movie.id} movie={movie} />
           ))}
         </ul>
-      ) : null}
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
-    )
-  }
+  )
+}
