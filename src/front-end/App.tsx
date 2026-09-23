@@ -6,6 +6,7 @@ import {
   DEFAULT_PAGE,
   DEFAULT_REGION,
 } from '../back-end/constants';
+import './app.css';
 
 export default function App() {
   // State to hold the fetched movies data, initialized to null
@@ -30,17 +31,29 @@ export default function App() {
   }, [language, page, region]);
 
   return (
-    <div>
-      <h1>Popular Movies</h1>
-      {movies ? (
-        <ul>
-          {movies.map((movie) => (
-            <MovieItem key={movie.id} movie={movie} />
-          ))}
-        </ul>
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+    <main className="app-shell">
+      <header className="app-header">
+        <h1>Films populaires</h1>
+        <h2>
+          Films tendances en France, d'après les données de{' '}
+          <b>The Movie Database</b>
+        </h2>
+      </header>
+      <section>
+        {movies ? (
+          <ul className="movie-grid">
+            {movies.map((movie) => (
+              <li key={movie.id}>
+                <article>
+                  <MovieItem movie={movie} />
+                </article>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="status-message">Loading...</p>
+        )}
+      </section>
+    </main>
   );
 }
