@@ -1,0 +1,23 @@
+:root {
+  color: #1c2238;
+  background: #e7f4fa;
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(112deg, #fff1c9 0%, #fbf6e8 48%, #cdeeff 100%);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
