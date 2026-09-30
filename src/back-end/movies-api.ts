@@ -61,3 +61,44 @@ export function registerMoviesApi(app: Express): void {
     },
   );
 }
+
+export function registerMoviesApiID(app: Express): void {
+  // Define a route handler for fetching popular movies from TMDB API
+  app.get(
+    '/api/movies/:id',
+    async (_req: express.Request, res: express.Response) => {
+      const queryParams = new URLSearchParams();
+
+      const { language, region } = _req.query;
+      const { id } = _req.params;
+
+      queryParams.append('language', (language as string) || DEFAULT_LANGUAGE);
+      queryParams.append('region', (region as string) || DEFAULT_REGION);
+
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/${encodeURIComponent(id)}?${queryParams.toString()}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tmdbAccessToken}`,
+              'Content-Type': 'application/json;charset=utf-8',
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `TMDB API request failed with status ${response.status}`,
+          );
+        }
+
+        const rawData =
+          (await response.json()) as TmdbMoviesRawResponse['results'][number];
+        res.json(toSupportedMovie(rawData));
+      } catch (error) {
+        console.error('Error fetching movie:', error);
+        res.status(500).json({ error: 'Failed to fetch movie' });
+      }
+    },
+  );
+}
