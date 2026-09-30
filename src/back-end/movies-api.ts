@@ -4,9 +4,10 @@ import { DEFAULT_LANGUAGE, DEFAULT_PAGE, DEFAULT_REGION } from './constants';
 import { tmdbAccessToken } from './config';
 import type {
   MoviesApiResponse,
+  TmdbMovieDetails,
   TmdbMoviesRawResponse,
 } from './schemas/MoviesTypes';
-import { toSupportedMovie } from './utils';
+import { toSupportedMovie, toSupportedMovieDetails } from './utils';
 
 export function registerMoviesApi(app: Express): void {
   // Define a route handler for fetching popular movies from TMDB API
@@ -71,13 +72,14 @@ export function registerMoviesApiID(app: Express): void {
 
       const { language, region } = _req.query;
       const { id } = _req.params;
+      const movieId = Array.isArray(id) ? id[0] : id;
 
       queryParams.append('language', (language as string) || DEFAULT_LANGUAGE);
       queryParams.append('region', (region as string) || DEFAULT_REGION);
 
       try {
         const response = await fetch(
-          `https://api.themoviedb.org/3/movie/${encodeURIComponent(id)}?${queryParams.toString()}`,
+          `https://api.themoviedb.org/3/movie/${encodeURIComponent(movieId)}?${queryParams.toString()}`,
           {
             headers: {
               Authorization: `Bearer ${tmdbAccessToken}`,
@@ -92,12 +94,13 @@ export function registerMoviesApiID(app: Express): void {
           );
         }
 
-        const rawData =
-          (await response.json()) as TmdbMoviesRawResponse['results'][number];
-        res.json(toSupportedMovie(rawData));
+        const rawData = (await response.json()) as TmdbMovieDetails;
+        res.json(toSupportedMovieDetails(rawData));
       } catch (error) {
         console.error('Error fetching movie:', error);
-        res.status(500).json({ error: 'Failed to fetch movie on ID : ' + id });
+        res
+          .status(500)
+          .json({ error: 'Failed to fetch movie on ID : ' + movieId });
       }
     },
   );
