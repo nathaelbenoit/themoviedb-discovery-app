@@ -97,7 +97,7 @@ export function registerMoviesApiID(app: Express): void {
         res.json(toSupportedMovie(rawData));
       } catch (error) {
         console.error('Error fetching movie:', error);
-        res.status(500).json({ error: 'Failed to fetch movie' });
+        res.status(500).json({ error: 'Failed to fetch movie on ID : ' + id });
       }
     },
   );
