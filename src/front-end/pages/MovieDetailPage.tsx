@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import type { MovieDetails } from '../../back-end/schemas/MoviesTypes';
 import MovieDetailCard from '../components/MovieDetailCard';
-import '../MovieDetailCard.css';
+import '../styles/MovieDetailCard.css';
 
 export default function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();

@@ -1,4 +1,4 @@
-import '../AboutPage.css';
+import '../styles/AboutPage.css';
 
 const technologies = [
   { name: 'TypeScript', description: 'Typage et fiabilité' },

@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router';
-import './app.css';
+import './styles/app.css';
 import NavBar from './components/NavBar';
 import AboutPage from './pages/AboutPage';
 import MovieDetailPage from './pages/MovieDetailPage';
