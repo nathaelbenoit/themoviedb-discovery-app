@@ -1,0 +1,224 @@
+import type { Express, Request, RequestHandler, Response } from 'express';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  DEFAULT_LANGUAGE,
+  DEFAULT_PAGE,
+  DEFAULT_REGION,
+} from '../utils/constants';
+import { tmdbAccessToken } from '../utils/config';
+import * as movieQueryParams from '../utils/movie-query-params';
+import { registerMoviesApi } from './movies-api';
+import type {
+  TmdbMovieDetails,
+  TmdbMoviesRawResponse,
+} from '../types/MoviesTypes';
+
+const { toSupportedMovieMock, toSupportedMovieDetailsMock } = vi.hoisted(
+  () => ({
+    toSupportedMovieMock: vi.fn(),
+    toSupportedMovieDetailsMock: vi.fn(),
+  }),
+);
+
+vi.mock('../utils/converter', () => ({
+  toSupportedMovie: toSupportedMovieMock,
+  toSupportedMovieDetails: toSupportedMovieDetailsMock,
+}));
+
+vi.mock('../utils/config', () => ({
+  tmdbAccessToken: 'test-access-token',
+}));
+
+type RouteHandler = (
+  req: Request,
+  res: Response,
+  next: (error?: unknown) => void,
+) => void | Promise<void>;
+
+const handlers = new Map<string, RequestHandler>();
+const app = {
+  get: (path: string, handler: RequestHandler) => handlers.set(path, handler),
+} as unknown as Express;
+
+function getHandler(path: string): RouteHandler {
+  const handler = handlers.get(path);
+  if (!handler) throw new Error(`No handler registered for ${path}`);
+  return handler as RouteHandler;
+}
+
+function createResponse() {
+  const response = { json: vi.fn(), status: vi.fn() };
+  response.status.mockReturnValue(response);
+  return response as unknown as Response & {
+    json: ReturnType<typeof vi.fn>;
+    status: ReturnType<typeof vi.fn>;
+  };
+}
+
+function tmdbResponse(data: unknown, ok = true, status = 200) {
+  return {
+    ok,
+    status,
+    json: vi.fn().mockResolvedValue(data),
+  } as unknown as Response;
+}
+
+describe('movies API', () => {
+  beforeEach(() => {
+    handlers.clear();
+    registerMoviesApi(app);
+    toSupportedMovieMock.mockReset();
+    toSupportedMovieDetailsMock.mockReset();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  describe('GET /api/movies/popular', () => {
+    it('returns popular movies', async () => {
+      // Arrange
+      const rawMovie = { id: 1 };
+      const rawData = {
+        page: 1,
+        results: [rawMovie],
+        total_pages: 2,
+        total_results: 1,
+      } as unknown as TmdbMoviesRawResponse;
+      const supportedMovie = { id: 1, title: 'Movie' };
+      const fetchMock = vi.fn().mockResolvedValueOnce(tmdbResponse(rawData));
+      vi.stubGlobal('fetch', fetchMock);
+      toSupportedMovieMock.mockReturnValue(supportedMovie);
+      const response = createResponse();
+      const createMovieQueryParamsSpy = vi.spyOn(
+        movieQueryParams,
+        'createMovieQueryParams',
+      );
+
+      // Act
+      await getHandler('/api/movies/popular')(
+        { query: {} } as Request,
+        response,
+        vi.fn(),
+      );
+
+      // Assert
+      // Assert that the createMovieQueryParams function was called with the correct query parameters
+      expect(createMovieQueryParamsSpy).toHaveBeenCalledWith({});
+
+      // Assert that the fetch function was called with the correct URL and headers
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.themoviedb.org/3/movie/popular?language=${DEFAULT_LANGUAGE}&page=${DEFAULT_PAGE}&region=${DEFAULT_REGION}`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${tmdbAccessToken}`,
+          }),
+        }),
+      );
+
+      // Assert that the response contains the transformed movie data
+      expect(response.json).toHaveBeenCalledWith({
+        page: DEFAULT_PAGE,
+        results: [supportedMovie],
+        total_pages: 2,
+        total_results: 1,
+      });
+    });
+
+    it('returns errors for unsuccessful and rejected popular movie requests', async () => {
+      // Arrange
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(tmdbResponse({}, false, 503))
+        .mockRejectedValueOnce(new Error('Network error'));
+      vi.stubGlobal('fetch', fetchMock);
+      const unsuccessfulResponse = createResponse();
+      const rejectedResponse = createResponse();
+
+      // Act
+      await getHandler('/api/movies/popular')(
+        { query: {} } as Request,
+        unsuccessfulResponse,
+        vi.fn(),
+      );
+      await getHandler('/api/movies/popular')(
+        { query: {} } as Request,
+        rejectedResponse,
+        vi.fn(),
+      );
+
+      // Assert
+      for (const response of [unsuccessfulResponse, rejectedResponse]) {
+        expect(response.status).toHaveBeenCalledWith(500);
+        expect(response.json).toHaveBeenCalledWith({
+          error: 'Failed to fetch popular movies',
+        });
+      }
+    });
+  });
+
+  describe('GET /api/movies/:id', () => {
+    it('returns movie details', async () => {
+      // Arrange
+      const rawData = { id: 42 } as unknown as TmdbMovieDetails;
+      const supportedDetails = { id: 42, title: 'Movie details' };
+      const fetchMock = vi.fn().mockResolvedValueOnce(tmdbResponse(rawData));
+      vi.stubGlobal('fetch', fetchMock);
+      toSupportedMovieDetailsMock.mockReturnValue(supportedDetails);
+      const response = createResponse();
+
+      // Act
+      await getHandler('/api/movies/:id')(
+        { params: { id: '42' }, query: {} } as unknown as Request,
+        response,
+        vi.fn(),
+      );
+
+      // Assert
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://api.themoviedb.org/3/movie/42?language=${DEFAULT_LANGUAGE}&page=${DEFAULT_PAGE}&region=${DEFAULT_REGION}`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${tmdbAccessToken}`,
+          }),
+        }),
+      );
+      expect(toSupportedMovieDetailsMock).toHaveBeenCalledWith(rawData);
+      expect(response.json).toHaveBeenCalledWith(supportedDetails);
+    });
+
+    it('returns errors for unsuccessful and rejected movie detail requests', async () => {
+      // Arrange
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(tmdbResponse({}, false, 404))
+        .mockRejectedValueOnce(new Error('Network error'));
+      vi.stubGlobal('fetch', fetchMock);
+      const unsuccessfulResponse = createResponse();
+      const rejectedResponse = createResponse();
+
+      // Act
+      await getHandler('/api/movies/:id')(
+        { params: { id: '42' }, query: {} } as unknown as Request,
+        unsuccessfulResponse,
+        vi.fn(),
+      );
+      await getHandler('/api/movies/:id')(
+        { params: { id: '42' }, query: {} } as unknown as Request,
+        rejectedResponse,
+        vi.fn(),
+      );
+
+      // Assert
+      for (const response of [unsuccessfulResponse, rejectedResponse]) {
+        expect(response.status).toHaveBeenCalledWith(500);
+        expect(response.json).toHaveBeenCalledWith({
+          error: 'Failed to fetch movie with ID 42',
+        });
+      }
+    });
+  });
+});

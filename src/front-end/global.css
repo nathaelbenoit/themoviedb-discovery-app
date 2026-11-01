@@ -1,0 +1,59 @@
+:root {
+  color-scheme: light;
+  color: #1c2238;
+  --page-background: linear-gradient(
+    112deg,
+    #fff1c9 0%,
+    #fbf6e8 48%,
+    #cdeeff 100%
+  );
+  --page-foreground: #1c2238;
+  --surface: #fdfcf9;
+  --surface-muted: rgb(255 255 255 / 58%);
+  --line: #cbd8e4;
+  --text-muted: #4b5c7d;
+  --text-secondary: #40546b;
+  --heading: #102f4c;
+  --ink-strong: #163854;
+  --accent: #176b86;
+  background: var(--page-background);
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page-background: linear-gradient(
+    112deg,
+    #121a2b 0%,
+    #182438 48%,
+    #102c3b 100%
+  );
+  --page-foreground: #ecf3fa;
+  --surface: #1e2a3b;
+  --surface-muted: rgb(43 59 79 / 78%);
+  --line: #40536b;
+  --text-muted: #acbad0;
+  --text-secondary: #c3cee0;
+  --heading: #edf6ff;
+  --ink-strong: #edf6ff;
+  --accent: #74c4d6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--page-background);
+  color: var(--page-foreground);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}

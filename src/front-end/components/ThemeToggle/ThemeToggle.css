@@ -1,0 +1,31 @@
+.app-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 7px;
+  background: transparent;
+  color: #eaf6ff;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.app-theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.app-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.app-theme-toggle:focus-visible {
+  outline: 3px solid #ffe07d;
+  outline-offset: 3px;
+}

@@ -1,0 +1,176 @@
+/* About page */
+.about-page {
+  padding-top: 52px;
+}
+
+.about-hero {
+  max-width: 720px;
+  padding: 0 0 44px;
+}
+
+.about-eyebrow,
+.about-section-label {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-hero h1 {
+  max-width: 700px;
+  margin: 0;
+  color: var(--heading);
+  font-size: 3.25rem;
+  line-height: 1.04;
+}
+
+.about-intro {
+  max-width: 620px;
+  margin: 20px 0 0;
+  color: var(--text-secondary);
+  font-size: 1.22rem;
+  line-height: 1.55;
+}
+
+.about-story {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.75fr) minmax(0, 1.25fr);
+  gap: 48px;
+  padding: 34px 0;
+  border-top: 2px solid var(--line);
+}
+
+.about-story h2,
+.about-stack h2,
+.about-repository h2 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.about-story > p {
+  max-width: 580px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1.08rem;
+  line-height: 1.62;
+}
+
+.about-stack {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.65fr) minmax(0, 1.35fr);
+  gap: 42px;
+  padding: 34px 0 38px;
+  border-top: 1px solid var(--line);
+}
+
+.about-stack ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-stack li {
+  min-height: 88px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+
+.about-stack strong,
+.about-stack span {
+  display: block;
+}
+
+.about-stack strong {
+  color: var(--ink-strong);
+  font-size: 1rem;
+}
+
+.about-stack span {
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.about-repository {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 28px 30px;
+  border: 1px solid #245e79;
+  border-radius: 8px;
+  background: #153f5d;
+}
+
+.about-repository .about-section-label,
+.about-repository h2 {
+  color: #f2fbff;
+}
+
+.about-repository .about-section-label {
+  margin-bottom: 7px;
+  color: #a8e2e7;
+}
+
+.about-repository a {
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  border: 2px solid #d5f1e8;
+  border-radius: 6px;
+  color: #f7fffc;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.about-repository a:hover {
+  background: #f7fffc;
+  color: #153f5d;
+}
+
+.about-repository a:focus-visible {
+  outline: 3px solid #ffe07d;
+  outline-offset: 4px;
+}
+@media (max-width: 600px) {
+  .about-page {
+    padding-top: 34px;
+  }
+
+  .about-hero {
+    padding-bottom: 34px;
+  }
+
+  .about-hero h1 {
+    font-size: 2.35rem;
+  }
+
+  .about-intro {
+    font-size: 1.05rem;
+  }
+
+  .about-story,
+  .about-stack {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 28px 0;
+  }
+
+  .about-stack ul {
+    grid-template-columns: 1fr;
+  }
+
+  .about-repository {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 24px;
+  }
+}

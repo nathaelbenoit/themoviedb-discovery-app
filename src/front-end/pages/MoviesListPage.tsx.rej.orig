@@ -1,0 +1,7 @@
+@@ -5,4 +5,4 @@
+   DEFAULT_PAGE,
+   DEFAULT_REGION,
+-} from '../../back-end/constants';
+-import type { Movie } from '../../back-end/schemas/MoviesTypes';
++} from '../../back-end/utils/constants';
++import type { Movie } from '../../back-end/types/MoviesTypes';
