@@ -1,0 +1,8 @@
+{
+  "name": "themoviedb-discovery-app",
+  "customizations": {
+    "vscode": {
+      "extensions": ["qwtel.sqlite-viewer", "vitest.explorer"]
+    }
+  }
+}
