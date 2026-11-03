@@ -60,6 +60,15 @@ npx tsx src/back-end/backend-cli.ts create-database --path ./data/ma-base.sqlite
 
 La commande initialise le schéma sans supprimer les données d'une base existante.
 
+Pour créer et mettre à jour les genres depuis TMDB :
+
+```sh
+npx tsx src/back-end/backend-cli.ts update-genres
+```
+
+La langue `fr-FR` est utilisée par défaut. Elle peut être modifiée avec
+`--language`, et le chemin de la base avec `--path`.
+
 ## API locale
 
 | Méthode | Route                 | Description                                                       |
