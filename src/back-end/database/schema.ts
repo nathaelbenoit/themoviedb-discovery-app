@@ -65,40 +65,40 @@ export function initializeSchema(database: DatabaseSync): void {
 function initializeMoviesSchema(database: DatabaseSync): void {
   database.exec(`
     CREATE TABLE IF NOT EXISTS movies (
-      ## The unique identifier for the movie
+      -- The unique identifier for the movie
       id INTEGER PRIMARY KEY,
-      ## The title of the movie
+      -- The title of the movie
       title TEXT NOT NULL,
-      ## The original title of the movie
+      -- The original title of the movie
       original_title TEXT NOT NULL,
-      ## The original language of the movie
+      -- The original language of the movie
       original_language TEXT NOT NULL,
-      ## The overview or synopsis of the movie
+      -- The overview or synopsis of the movie
       overview TEXT NOT NULL,
-      ## The release date of the movie as TEXT in the format 'YYYY-MM-DD', sqlite does not have a dedicated DATE type
+      -- The release date of the movie as TEXT in the format 'YYYY-MM-DD'; SQLite has no dedicated DATE type
       release_date TEXT,
-      ## The year of the movie's release, generated from the release_date
+      -- The year of the movie's release, generated from the release_date
       release_year INTEGER GENERATED ALWAYS AS (CAST(strftime('%Y', release_date) AS INTEGER)) STORED,
-      ## The popularity score of the movie
+      -- The popularity score of the movie
       popularity REAL,
-      ## The average vote score of the movie
+      -- The average vote score of the movie
       vote_average REAL,
-      ## The total number of votes the movie has received
+      -- The total number of votes the movie has received
       vote_count INTEGER,
-      ## The path to the movie's poster image
+      -- The path to the movie's poster image
       poster_path TEXT,
-      ## The path to the movie's backdrop image
+      -- The path to the movie's backdrop image
       backdrop_path TEXT,
-      ## The runtime of the movie in minutes
+      -- The runtime of the movie in minutes
       runtime_minutes INTEGER CHECK(runtime_minutes IS NULL OR runtime_minutes > 0),
-      ## The budget of the movie
+      -- The budget of the movie
       budget INTEGER CHECK(budget IS NULL OR budget > 0),
-      ## The revenue of the movie
+      -- The revenue of the movie
       revenue INTEGER CHECK(revenue IS NULL OR revenue > 0),
-      ## The timestamp when the movie data was collected
+      -- The timestamp when the movie data was collected
       collected_at TEXT NOT NULL
     );
-    ## Create an index on the release_year column for faster queries by release year
+    -- Create an index on the release_year column for faster queries by release year
     CREATE INDEX IF NOT EXISTS movies_release_year ON movies(release_year);
   `);
 }
@@ -110,20 +110,20 @@ function initializeMoviesSchema(database: DatabaseSync): void {
 export function initializeGenresSchema(database: DatabaseSync): void {
   database.exec(`
     CREATE TABLE IF NOT EXISTS genres (
-      ## The unique identifier for the genre
+      -- The unique identifier for the genre
       id INTEGER PRIMARY KEY,
-      ## The name of the genre
+      -- The name of the genre
       name TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS movie_genres (
-      ## The ID of the movie
+      -- The ID of the movie
       movie_id INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
-      ## The ID of the genre
+      -- The ID of the genre
       genre_id INTEGER NOT NULL REFERENCES genres(id),
-      ## The combination of movie_id and genre_id must be unique
+      -- The combination of movie_id and genre_id must be unique
       PRIMARY KEY (movie_id, genre_id)
     );
-    ## Create an index on the genre_id column for faster queries by genre
+    -- Create an index on the genre_id column for faster queries by genre
     CREATE INDEX IF NOT EXISTS movie_genres_genre_id ON movie_genres(genre_id);
   `);
 }
@@ -135,20 +135,20 @@ export function initializeGenresSchema(database: DatabaseSync): void {
 function initializeCountriesSchema(database: DatabaseSync): void {
   database.exec(`
     CREATE TABLE IF NOT EXISTS countries (
-      ## The unique code for the country
+      -- The unique code for the country
       code TEXT PRIMARY KEY,
-      ## The name of the country
+      -- The name of the country
       name TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS production_countries (
-      ## The ID of the movie
+      -- The ID of the movie
       movie_id INTEGER NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
-      ## The code of the country
+      -- The code of the country
       country_code TEXT NOT NULL REFERENCES countries(code),
-      ## The combination of movie_id and country_code must be unique
+      -- The combination of movie_id and country_code must be unique
       PRIMARY KEY (movie_id, country_code)
     );
-    ## Create an index on the country_code column for faster queries by country
+    -- Create an index on the country_code column for faster queries by country
     CREATE INDEX IF NOT EXISTS production_countries_country_code ON production_countries(country_code);
   `);
 }
