@@ -11,6 +11,7 @@
 
     /* Node ESM mode */
     "moduleResolution": "bundler",
+    "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": false,
