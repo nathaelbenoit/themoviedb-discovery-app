@@ -75,5 +75,9 @@ describe('back-end server routes', () => {
     it('registers the /api/movies/:id route', () => {
       expect(routeHandlers.has('/api/movies/:id')).toBe(true);
     });
+
+    it('registers the /api/discover/movies route', () => {
+      expect(routeHandlers.has('/api/discover/movies')).toBe(true);
+    });
   });
 });
