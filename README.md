@@ -62,17 +62,29 @@ La commande initialise le schéma sans supprimer les données d'une base existan
 
 ## API locale
 
-| Méthode | Route                 | Description                                                       |
-| ------- | --------------------- | ----------------------------------------------------------------- |
-| `GET`   | `/api/health`         | Vérifie que le serveur répond.                                    |
-| `GET`   | `/api/movies/popular` | Renvoie les films populaires.                                     |
-| `GET`   | `/api/movies/:id`     | Renvoie les détails du film correspondant à son identifiant TMDB. |
+| Méthode | Route                  | Description                                                       |
+| ------- | ---------------------- | ----------------------------------------------------------------- |
+| `GET`   | `/api/health`          | Vérifie que le serveur répond.                                    |
+| `GET`   | `/api/movies/popular`  | Renvoie les films populaires.                                     |
+| `GET`   | `/api/movies/:id`      | Renvoie les détails du film correspondant à son identifiant TMDB. |
+| `GET`   | `/api/discover/movies` | Renvoie une page de films d'une année donnée via TMDB Discover.   |
 
 Les routes des films acceptent les paramètres `language`, `page` et `region`. Exemple :
 
 ```text
 /api/movies/popular?language=fr-FR&page=1&region=FR
 ```
+
+La route Discover exige une année sur quatre chiffres comprise entre 1000 et 9999. Elle accepte aussi `language`, `page` et `region`, avec les valeurs par
+défaut `fr-FR`, `1` et `FR` :
+
+```text
+/api/discover/movies?year=2020
+/api/discover/movies?year=2020&language=en-US&page=2&region=US
+```
+
+Chaque appel récupère une seule page depuis TMDB et ne stocke pas les résultats
+dans SQLite.
 
 ## Vérifications
 
