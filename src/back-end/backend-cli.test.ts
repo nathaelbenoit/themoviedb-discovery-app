@@ -1,4 +1,6 @@
-import { resolve } from 'node:path';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const DEFAULT_DATABASE_PATH = '/tmp/movies-default.sqlite';
@@ -7,10 +9,17 @@ const closeMock = vi.fn();
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
 }));
+const upsertCountriesMock = vi.fn();
+const deleteUnusedCountriesMock = vi.fn(() => 2);
 
 vi.mock('./database/schema.ts', () => ({
   DEFAULT_DATABASE_PATH,
   getDatabase: getDatabaseMock,
+}));
+
+vi.mock('./database/country-repository.ts', () => ({
+  upsertCountries: upsertCountriesMock,
+  deleteUnusedCountries: deleteUnusedCountriesMock,
 }));
 
 /**
@@ -63,6 +72,55 @@ describe('backend-cli.ts', () => {
       } finally {
         logSpy.mockRestore();
       }
+    });
+
+    it('imports countries from a CSV and closes the database', async () => {
+      const csvPath = join(tmpdir(), `countries-${Date.now()}.csv`);
+      writeFileSync(csvPath, 'code,name\nFR,France\n');
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        await runCliWithArgs(['add-countries', csvPath]);
+
+        expect(upsertCountriesMock).toHaveBeenCalledWith(
+          expect.objectContaining({ close: closeMock }),
+          [{ code: 'FR', name: 'France' }],
+        );
+        expect(closeMock).toHaveBeenCalledOnce();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Imported 1 countries'),
+        );
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('cleans unused countries and reports the deleted count', async () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        await runCliWithArgs(['clean-countries']);
+
+        expect(deleteUnusedCountriesMock).toHaveBeenCalledWith(
+          expect.objectContaining({ close: closeMock }),
+        );
+        expect(closeMock).toHaveBeenCalledOnce();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Deleted 2 countries'),
+        );
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('validates the CSV before opening the database', async () => {
+      const csvPath = join(tmpdir(), `invalid-countries-${Date.now()}.csv`);
+      writeFileSync(csvPath, 'code,name\nfr,France\n');
+
+      await expect(runCliWithArgs(['add-countries', csvPath])).rejects.toThrow(
+        'code on data row 2',
+      );
+      expect(getDatabaseMock).not.toHaveBeenCalled();
     });
   });
 });
