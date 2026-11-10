@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Country } from '../types/CountriesTypes';
 import { initializeSchema } from './schema';
 import {
+  deleteUnusedCountries,
   getCountries,
   getCountryByCode,
   upsertCountries,
@@ -111,6 +112,52 @@ describe('country repository', () => {
       ).toThrow(/NOT NULL constraint failed/);
 
       expect(getCountries(database)).toEqual([]);
+    } finally {
+      database.close();
+    }
+  });
+
+  it('deletes only countries without a production association', () => {
+    const database = createDatabase();
+    try {
+      upsertCountries(database, [
+        { code: 'FR', name: 'France' },
+        { code: 'US', name: 'United States' },
+      ]);
+      database
+        .prepare(
+          `INSERT INTO movies
+            (id, title, original_title, original_language, overview, collected_at)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+        )
+        .run(1, 'Movie', 'Movie', 'en', 'Overview', '2026-01-01');
+      database
+        .prepare(
+          'INSERT INTO production_countries (movie_id, country_code) VALUES (?, ?)',
+        )
+        .run(1, 'FR');
+
+      expect(deleteUnusedCountries(database)).toBe(1);
+      expect(getCountries(database)).toEqual([{ code: 'FR', name: 'France' }]);
+    } finally {
+      database.close();
+    }
+  });
+
+  it('rolls back when deleting unused countries fails', () => {
+    const database = createDatabase();
+    try {
+      database.exec('DROP TABLE countries');
+
+      expect(() => deleteUnusedCountries(database)).toThrow(
+        /no such table: countries/,
+      );
+      expect(
+        database
+          .prepare("SELECT name FROM sqlite_master WHERE type = 'table'")
+          .all()
+          .map((row) => row.name),
+      ).not.toContain('countries');
     } finally {
       database.close();
     }
