@@ -99,4 +99,20 @@ describe('country repository', () => {
       database.close();
     }
   });
+
+  it('rolls back the transaction when a country cannot be inserted', () => {
+    const database = createDatabase();
+    try {
+      expect(() =>
+        upsertCountries(database, [
+          { code: 'FR', name: 'France' },
+          { code: 'US', name: null as unknown as string },
+        ]),
+      ).toThrow(/NOT NULL constraint failed/);
+
+      expect(getCountries(database)).toEqual([]);
+    } finally {
+      database.close();
+    }
+  });
 });
