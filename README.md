@@ -60,6 +60,22 @@ npx tsx src/back-end/backend-cli.ts create-database --path ./data/ma-base.sqlite
 
 La commande initialise le schéma sans supprimer les données d'une base existante.
 
+Pour importer ou actualiser les genres depuis un fichier CSV contenant exactement
+les colonnes `id` et `name` :
+
+```sh
+npx tsx src/back-end/backend-cli.ts add-genres ./data/genres.csv
+npx tsx src/back-end/backend-cli.ts --path ./data/ma-base.sqlite add-genres ./data/genres.csv
+```
+
+Pour supprimer uniquement les genres qui ne sont associés à aucun film :
+
+```sh
+npx tsx src/back-end/backend-cli.ts clean-genres
+```
+
+L'option `--path` permet également de sélectionner une autre base pour cette commande.
+
 ## API locale
 
 | Méthode | Route                 | Description                                                       |
