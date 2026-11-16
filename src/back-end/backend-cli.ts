@@ -114,19 +114,18 @@ program
 program
   .command('add-movies <csv-file>')
   .description('Import or update movies from a CSV file')
-  .option(
-    '-p, --path <path>',
-    'path to the SQLite database file',
-    DEFAULT_DATABASE_PATH,
-  )
-  .action((csvFile: string, { path }: { path: string }) => {
-    const database = getDatabase(path);
+  .option('-p, --path <path>', 'path to the SQLite database file')
+  .action(function (csvFile: string, { path }: { path?: string }) {
+    const databasePath = getPath(this, path);
+    const database = getDatabase(databasePath);
     try {
       const importedCount = importMoviesCsv(
         database,
         readFileSync(csvFile, 'utf8'),
       );
-      console.log(`Imported ${importedCount} movie(s) into ${resolve(path)}`);
+      console.log(
+        `Imported ${importedCount} movie(s) into ${resolve(databasePath)}`,
+      );
     } finally {
       database.close();
     }

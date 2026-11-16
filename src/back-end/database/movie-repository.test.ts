@@ -10,29 +10,6 @@ const createDatabase = (): DatabaseSync => {
   return database;
 };
 
-const movie: StoredMovieInput = {
-  id: 1,
-  title: 'Movie',
-  original_title: 'Movie',
-  original_language: 'en',
-  overview: 'Overview',
-  release_date: '2020-01-01',
-  popularity: 1,
-  vote_average: 7,
-  vote_count: 1,
-  poster_path: null,
-  backdrop_path: null,
-  runtime_minutes: null,
-  budget: null,
-  revenue: null,
-  collected_at: '2026-11-16T00:00:00.000Z',
-};
-
-describe('movie repository', () => {
-  it('rolls back all changes when a movie cannot be stored', () => {
-    // Arrange
-    const database = createDatabase();
-    try {
 const createMovie = (
   overrides: Partial<StoredMovieInput> = {},
 ): StoredMovieInput => ({
@@ -79,11 +56,10 @@ describe('movie repository', () => {
     // Arrange
     const database = createDatabase();
     try {
-      const firstMovie = createMovie({ id: 2, title: 'Second movie' });
-      const secondMovie = createMovie({ id: 1, title: 'First movie' });
-
-      // Act
-      upsertMovies(database, [firstMovie, secondMovie]);
+      upsertMovies(database, [
+        createMovie({ id: 2, title: 'Second movie' }),
+        createMovie({ id: 1, title: 'First movie' }),
+      ]);
 
       // Assert
       expect(getMovies(database).map(({ id }) => id)).toEqual([1, 2]);
@@ -127,10 +103,6 @@ describe('movie repository', () => {
       expect(() =>
         upsertMovies(database, [
           movie,
-          { ...movie, id: 2, title: null as unknown as string },
-        ]),
-      ).toThrow(/NOT NULL constraint failed/);
-      expect(getMovieById(database, movie.id)).toBeUndefined();
           createMovie({ id: 502356, title: null as unknown as string }),
         ]),
       ).toThrow(/NOT NULL constraint failed/);

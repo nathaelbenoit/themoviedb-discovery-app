@@ -7,7 +7,6 @@ const DEFAULT_DATABASE_PATH = '/tmp/movies-default.sqlite';
 
 const closeMock = vi.fn();
 const importMoviesCsvMock = vi.fn(() => 2);
-const readFileSyncMock = vi.fn(() => 'movies csv');
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
 }));
@@ -15,10 +14,6 @@ const upsertCountriesMock = vi.fn();
 const deleteUnusedCountriesMock = vi.fn(() => 2);
 const upsertGenresMock = vi.fn();
 const deleteUnusedGenresMock = vi.fn(() => 3);
-
-vi.mock('node:fs', () => ({
-  readFileSync: readFileSyncMock,
-}));
 
 vi.mock('./database/schema.ts', () => ({
   DEFAULT_DATABASE_PATH,
@@ -57,7 +52,6 @@ describe('backend-cli.ts', () => {
     vi.clearAllMocks();
     vi.resetModules();
     importMoviesCsvMock.mockReturnValue(2);
-    readFileSyncMock.mockReturnValue('movies csv');
   });
 
   describe('create-database', () => {
@@ -199,16 +193,12 @@ describe('backend-cli.ts', () => {
         ]);
 
         // Assert
-        expect(readFileSyncMock).toHaveBeenCalledWith(
-          './data/movies.csv',
-          'utf8',
-        );
         expect(getDatabaseMock).toHaveBeenCalledWith(
           './data/custom-movies.sqlite',
         );
         expect(importMoviesCsvMock).toHaveBeenCalledWith(
           expect.objectContaining({ close: closeMock }),
-          'movies csv',
+          expect.stringContaining('id,title,original_title,original_language'),
         );
         expect(closeMock).toHaveBeenCalledOnce();
         expect(logSpy).toHaveBeenCalledWith(
