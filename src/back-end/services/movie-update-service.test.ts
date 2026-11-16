@@ -8,6 +8,10 @@ import {
   updateMovieDatabase,
 } from './movie-update-service';
 
+vi.mock('../utils/config', () => ({
+  tmdbAccessToken: 'test-access-token',
+}));
+
 const createDatabase = (): DatabaseSync => {
   const database = new DatabaseSync(':memory:');
   initializeSchema(database);
