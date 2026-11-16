@@ -38,3 +38,34 @@ export function upsertCountries(
     throw error;
   }
 }
+
+export function deleteUnusedCountries(database: DatabaseSync): number {
+  database.exec('BEGIN TRANSACTION');
+  try {
+    const result = database
+      .prepare(`
+        SELECT COUNT(*) AS count
+        FROM countries
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM production_countries
+          WHERE production_countries.country_code = countries.code
+        )
+      `)
+      .get() as { count: number };
+
+    database.exec(`
+      DELETE FROM countries
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM production_countries
+        WHERE production_countries.country_code = countries.code
+      )
+    `);
+    database.exec('COMMIT');
+    return result.count;
+  } catch (error) {
+    database.exec('ROLLBACK');
+    throw error;
+  }
+}
