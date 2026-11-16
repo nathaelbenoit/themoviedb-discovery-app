@@ -9,6 +9,8 @@ const closeMock = vi.fn();
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
 }));
+const upsertCountriesMock = vi.fn();
+const deleteUnusedCountriesMock = vi.fn(() => 2);
 const upsertGenresMock = vi.fn();
 const deleteUnusedGenresMock = vi.fn(() => 3);
 
