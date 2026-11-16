@@ -9,12 +9,16 @@ const closeMock = vi.fn();
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
 }));
-const upsertCountriesMock = vi.fn();
-const deleteUnusedCountriesMock = vi.fn(() => 2);
+const upsertGenresMock = vi.fn();
+const deleteUnusedGenresMock = vi.fn(() => 3);
 
 vi.mock('./database/schema.ts', () => ({
   DEFAULT_DATABASE_PATH,
   getDatabase: getDatabaseMock,
+}));
+vi.mock('./database/genre-repository.ts', () => ({
+  deleteUnusedGenres: deleteUnusedGenresMock,
+  upsertGenres: upsertGenresMock,
 }));
 
 vi.mock('./database/country-repository.ts', () => ({
@@ -122,5 +126,47 @@ describe('backend-cli.ts', () => {
       );
       expect(getDatabaseMock).not.toHaveBeenCalled();
     });
+  });
+
+  it('imports genres into the selected database and closes the connection', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const customDatabasePath = './data/custom-movies.sqlite';
+    try {
+      await runCliWithArgs([
+        '--path',
+        customDatabasePath,
+        'add-genres',
+        './data/genres.csv',
+      ]);
+
+      expect(getDatabaseMock).toHaveBeenCalledWith(customDatabasePath);
+      expect(upsertGenresMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.arrayContaining([{ id: 28, name: 'Action' }]),
+      );
+      expect(closeMock).toHaveBeenCalledOnce();
+      expect(logSpy).toHaveBeenCalledWith(
+        `Imported 19 genre(s) into ${resolve(customDatabasePath)}`,
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
+  it('cleans unused genres in the selected database and reports the count', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const customDatabasePath = './data/custom-movies.sqlite';
+    try {
+      await runCliWithArgs(['clean-genres', '--path', customDatabasePath]);
+
+      expect(getDatabaseMock).toHaveBeenCalledWith(customDatabasePath);
+      expect(deleteUnusedGenresMock).toHaveBeenCalledOnce();
+      expect(closeMock).toHaveBeenCalledOnce();
+      expect(logSpy).toHaveBeenCalledWith(
+        `Removed 3 unused genre(s) from ${resolve(customDatabasePath)}`,
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
   });
 });
