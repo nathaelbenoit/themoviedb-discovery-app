@@ -38,8 +38,12 @@ export type TmdbMovieDetails = {
   video: boolean;
   vote_average: number;
   vote_count: number;
+  runtime?: number | null;
+  budget?: number;
+  revenue?: number;
   genres: Array<{ id: number; name: string }>;
   tagline: string | null;
+  production_countries?: Array<{ iso_3166_1: string; name: string }>;
   production_companies: Array<{
     id: number;
     logo_path: string | null;
@@ -62,7 +66,13 @@ export type Movie = Omit<TmdbMovie, 'adult' | 'video'>;
 // TypeScript type for the supported movie details format used in our application, omitting 'adult','video' and production_companies properties from the TmdbMovieDetails type.
 export type MovieDetails = Omit<
   TmdbMovieDetails,
-  'adult' | 'video' | 'production_companies'
+  | 'adult'
+  | 'video'
+  | 'runtime'
+  | 'budget'
+  | 'revenue'
+  | 'production_countries'
+  | 'production_companies'
 >;
 
 export type StoredMovie = {
