@@ -72,19 +72,70 @@ Pour utiliser une autre base de données :
 npx tsx src/back-end/backend-cli.ts add-movies ./data/movies.csv --path ./data/ma-base.sqlite
 ```
 
+### Importer et nettoyer les pays
+
+Le fichier [data/countries.csv](./data/countries.csv) contient les colonnes
+`code` et `name`. Pour importer ou actualiser les pays dans la base par défaut :
+
+```sh
+npx tsx src/back-end/backend-cli.ts add-countries ./data/countries.csv
+```
+
+Le chemin de la base peut être placé avant la commande ou après celle-ci :
+
+```sh
+npx tsx src/back-end/backend-cli.ts --path ./data/custom-movies.sqlite add-countries ./data/countries.csv
+```
+
+Pour supprimer uniquement les pays qui ne sont associés à aucun film :
+
+```sh
+npx tsx src/back-end/backend-cli.ts clean-countries
+npx tsx src/back-end/backend-cli.ts --path ./data/custom-movies.sqlite clean-countries
+```
+
+Chaque commande affiche le nombre de pays concernés et le chemin de la base utilisée.
+Pour importer ou actualiser les genres depuis un fichier CSV contenant exactement
+les colonnes `id` et `name` :
+
+```sh
+npx tsx src/back-end/backend-cli.ts add-genres ./data/genres.csv
+npx tsx src/back-end/backend-cli.ts --path ./data/ma-base.sqlite add-genres ./data/genres.csv
+```
+
+Pour supprimer uniquement les genres qui ne sont associés à aucun film :
+
+```sh
+npx tsx src/back-end/backend-cli.ts clean-genres
+```
+
+L'option `--path` permet également de sélectionner une autre base pour cette commande.
+
 ## API locale
 
-| Méthode | Route                 | Description                                                       |
-| ------- | --------------------- | ----------------------------------------------------------------- |
-| `GET`   | `/api/health`         | Vérifie que le serveur répond.                                    |
-| `GET`   | `/api/movies/popular` | Renvoie les films populaires.                                     |
-| `GET`   | `/api/movies/:id`     | Renvoie les détails du film correspondant à son identifiant TMDB. |
+| Méthode | Route                  | Description                                                       |
+| ------- | ---------------------- | ----------------------------------------------------------------- |
+| `GET`   | `/api/health`          | Vérifie que le serveur répond.                                    |
+| `GET`   | `/api/movies/popular`  | Renvoie les films populaires.                                     |
+| `GET`   | `/api/movies/:id`      | Renvoie les détails du film correspondant à son identifiant TMDB. |
+| `GET`   | `/api/discover/movies` | Renvoie une page de films d'une année donnée via TMDB Discover.   |
 
 Les routes des films acceptent les paramètres `language`, `page` et `region`. Exemple :
 
 ```text
 /api/movies/popular?language=fr-FR&page=1&region=FR
 ```
+
+La route Discover exige une année sur quatre chiffres comprise entre 1000 et 9999. Elle accepte aussi `language`, `page` et `region`, avec les valeurs par
+défaut `fr-FR`, `1` et `FR` :
+
+```text
+/api/discover/movies?year=2020
+/api/discover/movies?year=2020&language=en-US&page=2&region=US
+```
+
+Chaque appel récupère une seule page depuis TMDB et ne stocke pas les résultats
+dans SQLite.
 
 ## Vérifications
 

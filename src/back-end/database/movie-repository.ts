@@ -29,6 +29,12 @@ export function getMovieById(
     .get(id) as StoredMovie | undefined;
 }
 
+export function getMovies(database: DatabaseSync): StoredMovie[] {
+  return database
+    .prepare(`SELECT ${MOVIE_COLUMNS} FROM movies ORDER BY id ASC`)
+    .all() as StoredMovie[];
+}
+
 export function upsertMovies(
   database: DatabaseSync,
   movies: Iterable<StoredMovieInput>,

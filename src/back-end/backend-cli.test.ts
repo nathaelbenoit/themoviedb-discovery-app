@@ -1,4 +1,6 @@
-import { resolve } from 'node:path';
+import { writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const DEFAULT_DATABASE_PATH = '/tmp/movies-default.sqlite';
@@ -9,6 +11,10 @@ const readFileSyncMock = vi.fn(() => 'movies csv');
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
 }));
+const upsertCountriesMock = vi.fn();
+const deleteUnusedCountriesMock = vi.fn(() => 2);
+const upsertGenresMock = vi.fn();
+const deleteUnusedGenresMock = vi.fn(() => 3);
 
 vi.mock('node:fs', () => ({
   readFileSync: readFileSyncMock,
@@ -17,6 +23,15 @@ vi.mock('node:fs', () => ({
 vi.mock('./database/schema.ts', () => ({
   DEFAULT_DATABASE_PATH,
   getDatabase: getDatabaseMock,
+}));
+vi.mock('./database/genre-repository.ts', () => ({
+  deleteUnusedGenres: deleteUnusedGenresMock,
+  upsertGenres: upsertGenresMock,
+}));
+
+vi.mock('./database/country-repository.ts', () => ({
+  upsertCountries: upsertCountriesMock,
+  deleteUnusedCountries: deleteUnusedCountriesMock,
 }));
 
 vi.mock('./database/movie-csv.ts', () => ({
@@ -76,6 +91,97 @@ describe('backend-cli.ts', () => {
         logSpy.mockRestore();
       }
     });
+
+    it('imports countries from a CSV and closes the database', async () => {
+      const csvPath = join(tmpdir(), `countries-${Date.now()}.csv`);
+      writeFileSync(csvPath, 'code,name\nFR,France\n');
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        await runCliWithArgs(['add-countries', csvPath]);
+
+        expect(upsertCountriesMock).toHaveBeenCalledWith(
+          expect.objectContaining({ close: closeMock }),
+          [{ code: 'FR', name: 'France' }],
+        );
+        expect(closeMock).toHaveBeenCalledOnce();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Imported 1 countries'),
+        );
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('cleans unused countries and reports the deleted count', async () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        await runCliWithArgs(['clean-countries']);
+
+        expect(deleteUnusedCountriesMock).toHaveBeenCalledWith(
+          expect.objectContaining({ close: closeMock }),
+        );
+        expect(closeMock).toHaveBeenCalledOnce();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Deleted 2 countries'),
+        );
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+
+    it('validates the CSV before opening the database', async () => {
+      const csvPath = join(tmpdir(), `invalid-countries-${Date.now()}.csv`);
+      writeFileSync(csvPath, 'code,name\nfr,France\n');
+
+      await expect(runCliWithArgs(['add-countries', csvPath])).rejects.toThrow(
+        'code on data row 2',
+      );
+      expect(getDatabaseMock).not.toHaveBeenCalled();
+    });
+  });
+
+  it('imports genres into the selected database and closes the connection', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const customDatabasePath = './data/custom-movies.sqlite';
+    try {
+      await runCliWithArgs([
+        '--path',
+        customDatabasePath,
+        'add-genres',
+        './data/genres.csv',
+      ]);
+
+      expect(getDatabaseMock).toHaveBeenCalledWith(customDatabasePath);
+      expect(upsertGenresMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.arrayContaining([{ id: 28, name: 'Action' }]),
+      );
+      expect(closeMock).toHaveBeenCalledOnce();
+      expect(logSpy).toHaveBeenCalledWith(
+        `Imported 19 genre(s) into ${resolve(customDatabasePath)}`,
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
+  it('cleans unused genres in the selected database and reports the count', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const customDatabasePath = './data/custom-movies.sqlite';
+    try {
+      await runCliWithArgs(['clean-genres', '--path', customDatabasePath]);
+
+      expect(getDatabaseMock).toHaveBeenCalledWith(customDatabasePath);
+      expect(deleteUnusedGenresMock).toHaveBeenCalledOnce();
+      expect(closeMock).toHaveBeenCalledOnce();
+      expect(logSpy).toHaveBeenCalledWith(
+        `Removed 3 unused genre(s) from ${resolve(customDatabasePath)}`,
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
   });
 
   describe('add-movies', () => {
