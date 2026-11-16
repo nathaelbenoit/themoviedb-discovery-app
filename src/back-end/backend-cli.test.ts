@@ -4,13 +4,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const DEFAULT_DATABASE_PATH = '/tmp/movies-default.sqlite';
 
 const closeMock = vi.fn();
+const importMoviesCsvMock = vi.fn(() => 2);
+const readFileSyncMock = vi.fn(() => 'movies csv');
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
+}));
+
+vi.mock('node:fs', () => ({
+  readFileSync: readFileSyncMock,
 }));
 
 vi.mock('./database/schema.ts', () => ({
   DEFAULT_DATABASE_PATH,
   getDatabase: getDatabaseMock,
+}));
+
+vi.mock('./database/movie-csv.ts', () => ({
+  importMoviesCsv: importMoviesCsvMock,
 }));
 
 /**
@@ -31,6 +41,8 @@ describe('backend-cli.ts', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
+    importMoviesCsvMock.mockReturnValue(2);
+    readFileSyncMock.mockReturnValue('movies csv');
   });
 
   describe('create-database', () => {
@@ -59,6 +71,42 @@ describe('backend-cli.ts', () => {
         expect(closeMock).toHaveBeenCalledOnce();
         expect(logSpy).toHaveBeenCalledWith(
           `Database available at ${resolve(customDatabasePath)}`,
+        );
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
+  });
+
+  describe('add-movies', () => {
+    it('imports movies from the CSV file and closes the database', async () => {
+      // Arrange
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        // Act
+        await runCliWithArgs([
+          'add-movies',
+          './data/movies.csv',
+          '--path',
+          './data/custom-movies.sqlite',
+        ]);
+
+        // Assert
+        expect(readFileSyncMock).toHaveBeenCalledWith(
+          './data/movies.csv',
+          'utf8',
+        );
+        expect(getDatabaseMock).toHaveBeenCalledWith(
+          './data/custom-movies.sqlite',
+        );
+        expect(importMoviesCsvMock).toHaveBeenCalledWith(
+          expect.objectContaining({ close: closeMock }),
+          'movies csv',
+        );
+        expect(closeMock).toHaveBeenCalledOnce();
+        expect(logSpy).toHaveBeenCalledWith(
+          `Imported 2 movie(s) into ${resolve('./data/custom-movies.sqlite')}`,
         );
       } finally {
         logSpy.mockRestore();
