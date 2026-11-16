@@ -103,3 +103,39 @@ export function upsertMovies(
     throw error;
   }
 }
+
+export function replaceMovieAssociations(
+  database: DatabaseSync,
+  movieId: number,
+  genreIds: Iterable<number>,
+  countryCodes: Iterable<string>,
+): void {
+  database.exec('BEGIN TRANSACTION');
+  try {
+    database
+      .prepare('DELETE FROM movie_genres WHERE movie_id = ?')
+      .run(movieId);
+    database
+      .prepare('DELETE FROM production_countries WHERE movie_id = ?')
+      .run(movieId);
+
+    const genreStatement = database.prepare(
+      'INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)',
+    );
+    for (const genreId of genreIds) {
+      genreStatement.run(movieId, genreId);
+    }
+
+    const countryStatement = database.prepare(
+      'INSERT INTO production_countries (movie_id, country_code) VALUES (?, ?)',
+    );
+    for (const countryCode of countryCodes) {
+      countryStatement.run(movieId, countryCode);
+    }
+
+    database.exec('COMMIT');
+  } catch (error) {
+    database.exec('ROLLBACK');
+    throw error;
+  }
+}

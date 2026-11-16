@@ -2,7 +2,12 @@ import { DatabaseSync } from 'node:sqlite';
 import { describe, expect, it } from 'vitest';
 import type { StoredMovieInput } from '../types/MoviesTypes';
 import { initializeSchema } from './schema';
-import { getMovieById, getMovies, upsertMovies } from './movie-repository';
+import {
+  getMovieById,
+  getMovies,
+  replaceMovieAssociations,
+  upsertMovies,
+} from './movie-repository';
 
 const createDatabase = (): DatabaseSync => {
   const database = new DatabaseSync(':memory:');
@@ -107,6 +112,43 @@ describe('movie repository', () => {
         ]),
       ).toThrow(/NOT NULL constraint failed/);
       expect(getMovies(database)).toEqual([]);
+    } finally {
+      database.close();
+    }
+  });
+
+  it('replaces movie genre and production country associations', () => {
+    const database = createDatabase();
+    try {
+      upsertMovies(database, [createMovie()]);
+      database
+        .prepare('INSERT INTO genres (id, name) VALUES (?, ?)')
+        .run(18, 'Drama');
+      database
+        .prepare('INSERT INTO countries (code, name) VALUES (?, ?)')
+        .run('FR', 'France');
+
+      replaceMovieAssociations(database, 640146, [18], ['FR']);
+      replaceMovieAssociations(database, 640146, [], []);
+
+      expect(database.prepare('SELECT * FROM movie_genres').all()).toEqual([]);
+      expect(
+        database.prepare('SELECT * FROM production_countries').all(),
+      ).toEqual([]);
+    } finally {
+      database.close();
+    }
+  });
+
+  it('rolls back association changes when an association is invalid', () => {
+    const database = createDatabase();
+    try {
+      upsertMovies(database, [createMovie()]);
+
+      expect(() =>
+        replaceMovieAssociations(database, 640146, [999], []),
+      ).toThrow(/FOREIGN KEY constraint failed/);
+      expect(database.prepare('SELECT * FROM movie_genres').all()).toEqual([]);
     } finally {
       database.close();
     }
