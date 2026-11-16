@@ -44,7 +44,7 @@ const createDatabase = (): DatabaseSync => {
 describe('movie CSV importer', () => {
   it('parses movie CSV data and maps runtime to the database field', () => {
     // Arrange
-    const csv = `${CSV_HEADER}\n1,"Movie, One",Movie One,en,Overview,2020-01-02,10.5,7.2,100,/poster,/backdrop,120,1000,2000,"[1]","[]"`;
+    const csv = `${CSV_HEADER}\n1,"Movie, One",Movie One,en,Overview,,10.5,7.2,100,/poster,/backdrop,120,1000,2000,"[1]","[]"`;
 
     // Act
     const movies = parseMoviesCsv(csv, '2026-11-16T00:00:00.000Z');
@@ -57,7 +57,7 @@ describe('movie CSV importer', () => {
         original_title: 'Movie One',
         original_language: 'en',
         overview: 'Overview',
-        release_date: '2020-01-02',
+        release_date: null,
         popularity: 10.5,
         vote_average: 7.2,
         vote_count: 100,
@@ -115,5 +115,40 @@ describe('movie CSV importer', () => {
     expect(() =>
       parseMoviesCsv(invalidMovie, '2026-11-16T00:00:00.000Z'),
     ).toThrow('id on data row 2');
+  });
+
+  it('rejects invalid numeric, required, and positive values', () => {
+    // Arrange
+    const invalidPopularity = `${CSV_HEADER}\n${createCsvRow('1', 'Movie', 'en', 'Overview', 'not-a-number', '7', '1')}`;
+    const missingTitle = `${CSV_HEADER}\n${createCsvRow('1', '', 'en', 'Overview', '1', '7', '1')}`;
+    const invalidRuntime = `${CSV_HEADER}\n${[
+      '1',
+      'Movie',
+      'Movie',
+      'en',
+      'Overview',
+      '2020-01-02',
+      '1',
+      '7',
+      '1',
+      '',
+      '',
+      '0',
+      '100',
+      '2000',
+      '[]',
+      '[]',
+    ].join(',')}`;
+
+    // Act and assert
+    expect(() =>
+      parseMoviesCsv(invalidPopularity, '2026-11-16T00:00:00.000Z'),
+    ).toThrow('popularity on data row 2');
+    expect(() =>
+      parseMoviesCsv(missingTitle, '2026-11-16T00:00:00.000Z'),
+    ).toThrow('title on data row 2');
+    expect(() =>
+      parseMoviesCsv(invalidRuntime, '2026-11-16T00:00:00.000Z'),
+    ).toThrow('financial or runtime value on data row 2');
   });
 });
