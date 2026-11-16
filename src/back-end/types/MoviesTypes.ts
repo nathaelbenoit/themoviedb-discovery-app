@@ -65,6 +65,27 @@ export type MovieDetails = Omit<
   'adult' | 'video' | 'production_companies'
 >;
 
+export type StoredMovie = {
+  id: number;
+  title: string;
+  original_title: string;
+  original_language: string;
+  overview: string;
+  release_date: string | null;
+  release_year: number | null;
+  popularity: number | null;
+  vote_average: number | null;
+  vote_count: number | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  runtime_minutes: number | null;
+  budget: number | null;
+  revenue: number | null;
+  collected_at: string;
+};
+
+export type StoredMovieInput = Omit<StoredMovie, 'release_year'>;
+
 // TypeScript type for the API response when fetching popular movies, containing an array of supported Movie objects.
 export type ApiErrorResponse = {
   error: string;
