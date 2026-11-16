@@ -76,6 +76,7 @@ describe('movie update service', () => {
               runtime: 0,
               budget: undefined,
               revenue: null,
+              release_date: '',
             }),
           ),
       };
