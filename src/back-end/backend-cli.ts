@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { importMoviesCsv } from './database/movie-csv.ts';
 import {
   deleteUnusedCountries,
   upsertCountries,
@@ -108,6 +109,26 @@ program
     console.log(
       `Removed ${deletedCount} unused genre(s) from ${resolve(databasePath)}`,
     );
+  });
+
+program
+  .command('add-movies <csv-file>')
+  .description('Import or update movies from a CSV file')
+  .option('-p, --path <path>', 'path to the SQLite database file')
+  .action(function (csvFile: string, { path }: { path?: string }) {
+    const databasePath = getPath(this, path);
+    const database = getDatabase(databasePath);
+    try {
+      const importedCount = importMoviesCsv(
+        database,
+        readFileSync(csvFile, 'utf8'),
+      );
+      console.log(
+        `Imported ${importedCount} movie(s) into ${resolve(databasePath)}`,
+      );
+    } finally {
+      database.close();
+    }
   });
 
 program.parse();

@@ -1,5 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite';
-import type { StoredMovie, StoredMovieInput } from '../types/MoviesTypes';
+import type { StoredMovie, StoredMovieInput } from '../types/MoviesTypes.ts';
 
 const MOVIE_COLUMNS = `
   id,

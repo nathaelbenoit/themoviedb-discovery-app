@@ -56,11 +56,10 @@ describe('movie repository', () => {
     // Arrange
     const database = createDatabase();
     try {
-      const firstMovie = createMovie({ id: 2, title: 'Second movie' });
-      const secondMovie = createMovie({ id: 1, title: 'First movie' });
-
-      // Act
-      upsertMovies(database, [firstMovie, secondMovie]);
+      upsertMovies(database, [
+        createMovie({ id: 2, title: 'Second movie' }),
+        createMovie({ id: 1, title: 'First movie' }),
+      ]);
 
       // Assert
       expect(getMovies(database).map(({ id }) => id)).toEqual([1, 2]);

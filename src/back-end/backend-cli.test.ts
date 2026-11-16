@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const DEFAULT_DATABASE_PATH = '/tmp/movies-default.sqlite';
 
 const closeMock = vi.fn();
+const importMoviesCsvMock = vi.fn(() => 2);
 const getDatabaseMock = vi.fn(() => ({
   close: closeMock,
 }));
@@ -28,6 +29,10 @@ vi.mock('./database/country-repository.ts', () => ({
   deleteUnusedCountries: deleteUnusedCountriesMock,
 }));
 
+vi.mock('./database/movie-csv.ts', () => ({
+  importMoviesCsv: importMoviesCsvMock,
+}));
+
 /**
  * Executes the backend CLI with the specified command-line arguments
  * @param args The command-line arguments to pass to the CLI
@@ -46,6 +51,7 @@ describe('backend-cli.ts', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
+    importMoviesCsvMock.mockReturnValue(2);
   });
 
   describe('create-database', () => {
@@ -170,5 +176,37 @@ describe('backend-cli.ts', () => {
     } finally {
       logSpy.mockRestore();
     }
+  });
+
+  describe('add-movies', () => {
+    it('imports movies from the CSV file and closes the database', async () => {
+      // Arrange
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      try {
+        // Act
+        await runCliWithArgs([
+          'add-movies',
+          './data/movies.csv',
+          '--path',
+          './data/custom-movies.sqlite',
+        ]);
+
+        // Assert
+        expect(getDatabaseMock).toHaveBeenCalledWith(
+          './data/custom-movies.sqlite',
+        );
+        expect(importMoviesCsvMock).toHaveBeenCalledWith(
+          expect.objectContaining({ close: closeMock }),
+          expect.stringContaining('id,title,original_title,original_language'),
+        );
+        expect(closeMock).toHaveBeenCalledOnce();
+        expect(logSpy).toHaveBeenCalledWith(
+          `Imported 2 movie(s) into ${resolve('./data/custom-movies.sqlite')}`,
+        );
+      } finally {
+        logSpy.mockRestore();
+      }
+    });
   });
 });
