@@ -39,8 +39,8 @@ export type TmdbMovieDetails = {
   vote_average: number;
   vote_count: number;
   runtime?: number | null;
-  budget?: number;
-  revenue?: number;
+  budget?: number | null;
+  revenue?: number | null;
   genres: Array<{ id: number; name: string }>;
   tagline: string | null;
   production_countries?: Array<{ iso_3166_1: string; name: string }>;
