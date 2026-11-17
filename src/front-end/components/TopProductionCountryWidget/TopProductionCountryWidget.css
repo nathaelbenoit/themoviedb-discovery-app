@@ -1,0 +1,44 @@
+.top-production-country-widget {
+  width: min(100%, 360px);
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface-muted);
+  box-shadow: 0 8px 18px rgb(41 69 99 / 9%);
+}
+
+.top-production-country-widget__label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.top-production-country-widget h2 {
+  margin: 0 0 18px;
+  color: var(--heading);
+  font-size: 1.35rem;
+}
+
+.top-production-country-widget__status,
+.top-production-country-widget__country,
+.top-production-country-widget__count {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.top-production-country-widget__country {
+  overflow-wrap: anywhere;
+  color: var(--heading);
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.top-production-country-widget__count {
+  margin-top: 4px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
