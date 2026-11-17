@@ -1,0 +1,42 @@
+.average-rating-widget {
+  width: min(100%, 320px);
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface-muted);
+  box-shadow: 0 8px 18px rgb(41 69 99 / 9%);
+}
+
+.average-rating-widget__label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.average-rating-widget h2 {
+  margin: 0 0 18px;
+  color: var(--heading);
+  font-size: 1.35rem;
+}
+
+.average-rating-widget__value,
+.average-rating-widget__status,
+.average-rating-widget__type {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.average-rating-widget__value {
+  color: var(--heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.average-rating-widget__type {
+  margin-top: 4px;
+  font-size: 0.88rem;
+}
