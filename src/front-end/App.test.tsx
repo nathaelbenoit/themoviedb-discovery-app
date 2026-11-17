@@ -36,6 +36,9 @@ vi.mock('./pages/MovieDetailPage/MovieDetailPage', () => ({
 vi.mock('./pages/MoviesListPage/MoviesListPage', () => ({
   default: () => <div>Movies list page</div>,
 }));
+vi.mock('./pages/DashboardPage/DashboardPage', () => ({
+  default: () => <div>Dashboard page</div>,
+}));
 vi.mock('./pages/NotFoundPage/NotFoundPage', () => ({
   default: () => <div>Not found page</div>,
 }));
@@ -56,6 +59,7 @@ describe('App', () => {
   it('maps each application route to its corresponding page', () => {
     // Arrange
     const expectedRoutes = [
+      { path: '/dashboard', page: 'Dashboard page' },
       { path: '/movies', page: 'Movies list page' },
       { path: '/movies/123', page: 'Movie detail page' },
       { path: '/about', page: 'About page' },
