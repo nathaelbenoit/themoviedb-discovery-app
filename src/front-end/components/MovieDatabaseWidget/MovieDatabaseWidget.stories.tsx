@@ -4,8 +4,15 @@ import MovieDatabaseWidget from './MovieDatabaseWidget';
 const meta = {
   title: 'Dashboard/MovieDatabaseWidget',
   component: MovieDatabaseWidget,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'Le widget "Films en base" affiche le nombre de films disponibles et les états de chargement, vide et erreur.',
+      },
+    },
   },
 } satisfies Meta<typeof MovieDatabaseWidget>;
 
