@@ -147,3 +147,23 @@ npm run fmt:check # Vérifie le formatage
 ```
 
 La configuration de couverture des tests exige 100 % pour les instructions, branches, fonctions et lignes.
+
+## Storybook
+
+Storybook permet de visualiser les composants et leurs différents états sans
+lancer l'application complète. Pour démarrer l'interface en développement :
+
+```sh
+npm run storybook
+```
+
+Storybook est ensuite disponible à l'adresse
+[http://localhost:6006](http://localhost:6006). Les stories sont placées à côté
+des composants concernés dans `src/` et suivent le format
+`*.stories.tsx`.
+
+Pour vérifier la génération d'une version statique :
+
+```sh
+npm run build-storybook
+```
