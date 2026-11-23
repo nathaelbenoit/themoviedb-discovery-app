@@ -1,0 +1,112 @@
+.popular-movie-card {
+  width: 100%;
+  max-width: 640px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 8px 18px rgb(41 69 99 / 9%);
+}
+
+.popular-movie-card__label {
+  margin: 0;
+  padding: 18px 20px 14px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.popular-movie-card__content {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+}
+
+.popular-movie-card__poster {
+  width: 180px;
+  height: 270px;
+  object-fit: cover;
+  background: #d8e0e6;
+}
+
+.popular-movie-card__poster--placeholder {
+  background: linear-gradient(145deg, #26354e, #8393a8);
+}
+
+.popular-movie-card__copy {
+  min-width: 0;
+  padding: 22px 24px;
+}
+
+.popular-movie-card__copy h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 24px;
+  color: var(--heading);
+  font-size: clamp(1.35rem, 4vw, 2rem);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.popular-movie-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.popular-movie-card__meta div {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.popular-movie-card__meta dt {
+  margin-bottom: 4px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.popular-movie-card__meta dd {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 1.05rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.popular-movie-card--state {
+  min-height: 180px;
+}
+
+.popular-movie-card__message {
+  margin: 24px 20px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .popular-movie-card__content {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .popular-movie-card__poster {
+    width: 120px;
+    height: 180px;
+  }
+
+  .popular-movie-card__copy {
+    padding: 16px;
+  }
+
+  .popular-movie-card__copy h2 {
+    margin-bottom: 14px;
+  }
+
+  .popular-movie-card__meta {
+    grid-template-columns: 1fr;
+  }
+}
