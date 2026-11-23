@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { Movie } from '../../../back-end/types/MoviesTypes';
-import PopularMovieCard, { formatPopularity } from './PopularMovieCard';
+import PopularMovieCard, {
+  formatPopularity,
+  type PopularMovie,
+} from './PopularMovieCard';
 
 afterEach(cleanup);
 
@@ -13,7 +15,7 @@ const movie = {
   release_date: '2024-05-10',
   popularity: 1036.49,
   poster_path: '/popular-poster.jpg',
-} as Movie;
+} satisfies PopularMovie;
 
 describe('PopularMovieCard', () => {
   it('renders the label, poster, title, year, and formatted popularity', () => {
@@ -43,7 +45,7 @@ describe('PopularMovieCard', () => {
       ...movie,
       poster_path: null,
       popularity: null,
-    } as unknown as Movie;
+    } satisfies PopularMovie;
 
     // Act: render the incomplete card state.
     render(<PopularMovieCard movie={incompleteMovie} />);
@@ -56,6 +58,21 @@ describe('PopularMovieCard', () => {
       screen.getByRole('img', { name: 'Affiche indisponible' }),
     ).toBeTruthy();
     expect(screen.getByText('Inconnue')).toBeTruthy();
+  });
+
+  it('renders an explicit fallback when the poster fails to load', () => {
+    // Arrange: render a movie with an existing poster URL.
+    render(<PopularMovieCard movie={movie} />);
+
+    // Act: simulate a network or image decoding failure.
+    fireEvent.error(
+      screen.getByRole('img', { name: `Affiche de ${movie.title}` }),
+    );
+
+    // Assert: the inaccessible poster is replaced by an explicit accessible fallback.
+    expect(
+      screen.getByRole('img', { name: 'Affiche indisponible' }),
+    ).toBeTruthy();
   });
 
   it('renders loading and error states accessibly', () => {
@@ -80,5 +97,48 @@ describe('PopularMovieCard', () => {
     // Assert: unknown values never masquerade as ratings or vote counts.
     expect(formatPopularity(null)).toBe('Inconnue');
     expect(formatPopularity(Number.NaN)).toBe('Inconnue');
+  });
+
+  it('handles inaccessible TMDB posters', async () => {
+    // Arrange: set up a movie with a broken poster URL.
+    const brokenPosterMovie = {
+      ...movie,
+      poster_path: '/path-to-a-really-broken-image.jpg',
+    } satisfies PopularMovie;
+    render(<PopularMovieCard movie={brokenPosterMovie} />);
+
+    // Assert: initially, the poster is visible but broken.
+    const poster = screen.getByRole('img', {
+      name: `Affiche de ${movie.title}`,
+    });
+    expect(poster).toBeTruthy();
+    expect(poster.getAttribute('src')).toContain(
+      '/path-to-a-really-broken-image.jpg',
+    );
+
+    // Act: simulate the poster failing to load.
+    fireEvent.error(poster);
+
+    // Assert: the component falls back to the unavailable poster image.
+    const fallbackPoster = await screen.findByRole('img', {
+      name: 'Affiche indisponible',
+    });
+    expect(fallbackPoster).toBeTruthy();
+  });
+
+  it('renders empty catalogue data and an unknown release year', () => {
+    // Arrange and act: render without a movie, then with a titleless, yearless movie.
+    const { rerender } = render(<PopularMovieCard />);
+
+    // Assert: the empty catalogue state is explicit.
+    expect(screen.getByText('Aucune donnée disponible')).toBeTruthy();
+
+    rerender(
+      <PopularMovieCard movie={{ ...movie, title: '', release_date: null }} />,
+    );
+
+    // Assert: the title and release year fallbacks remain readable.
+    expect(screen.getByText('Titre inconnu')).toBeTruthy();
+    expect(screen.getByText('Inconnue')).toBeTruthy();
   });
 });
