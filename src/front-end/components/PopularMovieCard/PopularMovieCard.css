@@ -1,0 +1,117 @@
+.popular-movie-card {
+  width: min(100%, 420px);
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface-muted);
+  box-shadow: 0 8px 18px rgb(41 69 99 / 9%);
+}
+
+.popular-movie-card__label {
+  margin: 0 0 18px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.popular-movie-card__content {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.popular-movie-card__poster {
+  width: 104px;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--line);
+}
+
+.popular-movie-card__poster--placeholder {
+  display: grid;
+  padding: 8px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+  place-items: center;
+  background: linear-gradient(145deg, #26354e, #8393a8);
+}
+
+.popular-movie-card__copy {
+  min-width: 0;
+}
+
+.popular-movie-card__copy h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 12px;
+  color: var(--heading);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.popular-movie-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.popular-movie-card__meta div {
+  min-width: 0;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.popular-movie-card__meta dt {
+  margin-bottom: 3px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.popular-movie-card__meta dd {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 0.9rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.popular-movie-card--state {
+  min-height: 180px;
+}
+
+.popular-movie-card__message {
+  margin: 24px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+@media (max-width: 420px) {
+  .popular-movie-card {
+    padding: 18px;
+  }
+
+  .popular-movie-card__content {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .popular-movie-card__poster {
+    width: 84px;
+  }
+
+  .popular-movie-card__meta {
+    grid-template-columns: 1fr;
+  }
+}
